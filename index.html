@@ -1,0 +1,1456 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="app-angel" content="app-id=370144476" />
+
+    <meta http-equiv="Expires" content="Tue, 01 Jan 1980 1:00:00 GMT">
+    <meta http-equiv="Last-Modified" content="0">
+    <meta http-equiv="Cache-Control" content="no-cache, mustrevalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+
+    <title>Angel App</title>
+
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Fallback application metadata for legacy browsers -->
+    <meta name="app-angel" content="angel_test" />
+    <link rel="icon" href="img/icons/icon-72.png">
+    <link rel="icon" sizes="72x72" href="img/icons/icon-72.png">
+    <link rel="icon" sizes="114x114" href="img/icons/icon-114.png">
+    <link rel="icon" sizes="300x300" href="img/icons/icon-300.png">
+    <link rel="apple-touch-icon" href="img/icons/icon-72.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="img/icons/icon-72.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="img/icons/icon-114.png">
+    <link rel="apple-touch-icon" sizes="300x300" href="img/icons/icon-300.png">
+
+    <link rel="stylesheet" href="css/framework7.ios.css?v=13">
+    <link rel="stylesheet" href="css/framework7.ios.colors.css?v=12">
+    <link rel="stylesheet" href="css/app.css?v=15">
+    <link rel="stylesheet" href="css/font-awesome/css/font-awesome.min.css?v=12" media="screen">
+    <link rel="stylesheet" href="css/font-custom/style.css?v=13" media="screen">
+    <link rel="stylesheet" type="text/css" href="css/addtohomescreen.css">
+
+    <!--<link href="https://fonts.googleapis.com/css?family=Shadows+Into+Light" rel="stylesheet">-->
+
+    <!-- Flags -->
+    <link rel="stylesheet" href="css/intlTelInput.css">
+
+    <!--CSS Stars-->
+    <link rel="stylesheet" type="text/css" href="star/starability-minified/starability-all.min.css" />
+    <!--<link rel="stylesheet" href="css/kc.fab.css" />-->
+
+    <!-- Language -->
+    <script src="language.js?v=15"></script>
+
+    <script>
+        window.onload = function() {
+            //window.location.reload(false);
+            myApp.onPageInit('*', function(page) {
+                console.log(page.name + ' initialized');
+                //if(localization['tip_cancel']!= undefined )
+                  //  $('.searchbar-cancel').html(localization['tip_cancel']);
+
+                if (typeof history.pushState === "function") {
+                    history.pushState("jibberish", null, null);
+                    window.onpopstate = function() {
+                        console.log('Page Inicio: '+page.name);
+                        if (page.name == 'index') {
+                            myApp.modal({
+                                title: 'Angel',
+                                text: localization['confirm_exit'],
+                                buttons: [{
+                                    text: '<span style="text-transform: uppercase">'+localization['yes']+'</span>',
+                                    onClick: function() {
+                                        console.log(history);
+                                        window.localStorage.setItem("login_email",'');
+                                        window.localStorage.setItem("login_tel", '');
+                                        myApp.loginScreen();
+                                    }
+                                }, {
+                                    text: '<span style="text-transform: uppercase">'+localization['no']+'</span>',
+                                    onClick: function() {
+                                        history.pushState('newjibberish', null, null);
+                                    }
+                                }, ]
+                            })
+                        } else {
+                            history.pushState('newjibberish', null, null);
+                            console.log('prueba back');
+                            mainView.router.back();
+                        }
+                        //history.pushState('newjibberish', null, null);
+                        // Handle the back (or forward) buttons here
+                        // Will NOT handle refresh, use onbeforeunload for this.
+                    };
+                }
+                if (page.name == 'page-create-request') {
+                    console.log('saliendo form');
+                    //out();
+                }
+                if(page.name == 'page-view-chat'){
+                    chat_active = 'yes';
+                    //console.log('entro a llamar el reload');
+                    AltChat();
+                }
+
+            });
+
+            myApp.onPageReinit('*', function(page) {
+                myApp.onPageAfterBack('*', function(pageback) {
+                    if(pageback.name == 'page-view-chat'){
+                        chat_active = 'no';
+                        //console.log('Nuevo Status:' + chat_active);
+                    }
+                });
+
+                if(page.name == 'page-view-chat'){
+                    chat_active = 'yes';
+                    //console.log('entro a llamar el reload');
+                    AltChat();
+                }
+
+                if (typeof history.pushState === "function") {
+                    history.pushState("jibberish", null, null);
+                    window.onpopstate = function() {
+                        if (page.name == 'index') {
+                            myApp.modal({
+                                title: 'Angel',
+                                text: localization['confirm_exit'],
+                                buttons: [{
+                                    text: '<span style="text-transform: uppercase">'+localization['yes']+'</span>',
+                                    onClick: function() {
+                                        console.log(history);
+                                        window.localStorage.setItem("login_email",'');
+                                        window.localStorage.setItem("login_tel", '');
+                                        myApp.loginScreen();
+                                    }
+                                }, {
+                                    text: '<span style="text-transform: uppercase">'+localization['no']+'</span>',
+                                    onClick: function() {
+                                        history.pushState('newjibberish', null, null);
+                                    }
+                                }, ]
+                            })
+                        } else if (page.name == 'page-request') {
+                            //history.pushState('newjibberish', null, null);
+                            mainView.router.load({
+                                pageName: 'index'
+                            });
+                        } else {
+                            history.pushState('newjibberish', null, null);
+                            mainView.router.back();
+                        }
+                        //history.pushState('newjibberish', null, null);
+                        // Handle the back (or forward) buttons here
+                        // Will NOT handle refresh, use onbeforeunload for this.
+                    };
+                }
+            });
+        }
+    </script>
+
+
+    <style>
+        .navbar{
+            background-image:url('https://hotel.mynuvola.com/images/hotels-logos-angel/default-login.jpg') !important;
+            background-color: #fff;
+        }
+        .navbar a, .navbar div, .toolbar-inner .name-hotel-title-bottom{
+                text-shadow: 1px 1px 1px #363636;
+        }
+        .navbar .active{
+            text-shadow: none;
+            font-weight: 700;
+        }
+        .hotel-name-bottom{
+            background-image:url('https://hotel.mynuvola.com/images/hotels-logos-angel/default-login.jpg') !important; background-size: cover;
+        }
+    </style>
+
+</head>
+
+
+<body class="theme-lightblue">
+
+    <!-- INICIA LA PÁGINA DE INICIO DE SESIÓN -->
+    <div id="login-screen">
+        <!-- Default view-page layout -->
+        <div class="view">
+            <div class="page">
+                <!-- page-content has additional login-screen content -->
+                <div class="page-content login-screen-content login-wraper" style="background-image: url('https://hotel.mynuvola.com/images/hotels-logos-angel/default-login.jpg'); background-size:cover; background-position: center center;">
+
+                    <div class="top-login ">
+                        &nbsp;
+                    </div>
+
+                    <div id="login-logo">
+                        <img id="img-login-logo" src="https://hotel.mynuvola.com/images/hotels-logos-angel/angel-icon-login-2.png" style="max-width: 260px; max-height: 100px;">
+                    </div>
+
+                    <div class="login-form-container">
+                        <form>
+
+                            <div class="row" style="margin-top:10px;">
+                                <div class="col-15"></div>
+                                <div class="col-70">
+                                    <div class="login-inputs">
+                                        <input type="email" class="login-input lang__login_email" name="login-email" id="login-email" autocomplete="off" placeholder="Email" style="margin-bottom: 7px">
+                                        <input maxlength="20" type="tel" class="login-input last-input lang__login_phone_number" name="login-tel" id="login-tel" autocomplete="off" placeholder="Phone">
+                                    </div>
+
+                                    <!--<a id="signin" onclick="Login();" class="button button-login center lang__login_sig_in" style="font-weight: normal; color: #39AAD6 !important;">SIGN IN</a>-->
+
+                                    <a href="#" class="link-blue" onclick="Login()">
+                                        <div class="login-button lang__login_sig_in">SIGN IN</div>
+                                    </a>
+
+                                    <div class="row no-gutter" style="margin-top: 12px">
+                                        <!--<div class="col-100 remember-pass-label center" onclick="ChangeLanguage()" style="text-align: center; font-size: 16px; ">English / Español</div>-->
+
+                                        <div class="col-100 center login-text lang__change_language" onclick="ActionTranslate()">
+                                            Change Language
+                                        </div>
+
+                                        <input type="hidden" value="en" id="lang-app-guest" readonly>
+                                    </div>
+
+                                </div>
+                                <div class="col-15"></div>
+                            </div>
+
+                            <input type="submit" class="go-capture" />
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- TERMINA LA PÁGINA DE INICIO DE SESIÓN -->
+
+    <!-- INICIAN LAS VISTAS -->
+    <div class="views">
+        <!-- INICIA LA VISA PRINCIPAL PRINCIPAL -->
+        <div class="view view-main">
+            <div class="pages">
+
+
+                <!--PAGE MENU PRINCIPAL-->
+                <div id="menu" class="page navbar-fixed cached menu-cuadricula" data-page="index">
+
+                    <div id="menu-content" class="page-content backg-menu" style="box-sizing:content-box">
+                        <div class="div-hotel">
+                            <div class="name-hotel" id="name-hotel" style="display: none"></div>
+                            <div id="image-hotel" class="backg-logo" style="margin-top: 50px"></div>
+
+
+                            <div class="row no-gutter top-grid-menu">
+                                <div class="col-50 grid-items-menu" onclick="GoToRequest()" >
+                                    <div style="max-height: 31px"><i class="fa fa-list-ul icon_adjust" aria-hidden="true"></i> <span id="count-dashboard-msg" style="position: absolute; margin-top: -10px;"></span></div>
+                                    <div class="title-module lang__menu_dashboard">Requests</div>
+                                </div>
+                                <div class="col-50 grid-items-menu" onclick="GoToCreateRequest()" >
+                                    <div style="max-height: 31px"><i class="fa fa-plus-circle icon_adjust" aria-hidden="true"></i></div>
+                                    <div class="title-module lang__menu_create_request">Create Request</div>
+                                </div>
+                                <!-- CAMBIOS DESARROLLO -->
+                                <div class="col-50 grid-items-menu" onclick="GoToPackagesLostFound(); RefresCountEventNew()">
+                                    <div style="max-height: 31px"><i class="fa fa-cubes icon_adjust" aria-hidden="true"></i></div>
+                                    <div class="title-module lang__package_title">Packages</div>
+                                </div>
+                                
+                                <!--CAMBIOS LUIS TOBIO: UBER,TRIPADVISOR, TIPS, WAKEUPCALLS-->
+                                <div class="col-50 grid-items-menu" onclick="GoToWakeUpCalls()"  >
+                                    <div style="max-height: 31px"><i class="fa icon-alarm-clock icon_adjust" aria-hidden="true"></i></div>
+                                    <div class="title-module lang__menu_wake_up_calls">Wake Up Calls</div>
+                                </div>
+                                <!--FIN CAMBIOS LUIS TOBIO-->
+                                <div class="col-50 grid-items-menu" onclick="GoToGuestSurvey(); RefresCountEventNew()">
+                                    <div style="max-height: 31px"><i class="fa fa-star icon_adjust" aria-hidden="true"></i></div>
+                                    <div class="title-module lang__menu_rate_my_stay">Rate Service</div>
+                                </div>
+
+                                <div class="col-50 grid-items-menu"  onclick="ActionTranslate();" >
+                                    <div style="max-height: 31px"><i class="fa fa-globe icon_adjust" aria-hidden="true"></i></div>
+                                    <div class="title-module lang__change_language">Change Language</div>
+                                </div>
+
+                                <div class="col-100 grid-items-menu open-login-screen"  onclick="LogOut()" >
+                                    <div style="max-height: 31px"><i class="fa fa-sign-out icon_adjust" aria-hidden="true"></i></div>
+                                    <div class="title-module lang__menu_log_out">Log Out</div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <!--END PAGE MENU PRINCIPAL-->
+                <div class="page cached" data-page="intro-slider">
+                    <div class="page-content" style="padding-top: 0px;">
+                        <!-- Slider -->
+                        <div data-pagination=".swiper-pagination" data-space-between="0" data-next-button=".swiper-button-next" data-prev-button=".swiper-button-prev" data-pagination-clickable="true" class="swiper-container swiper-init">
+
+                            <div class="swiper-pagination"></div>
+
+                            <div class="swiper-wrapper">
+                                <div class="swiper-slide">
+                                    <img id="img1" style="width: 100%">
+                                </div>
+                                <div class="swiper-slide">
+                                    <img id="img2"  style="width: 100%">
+                                </div>
+                                <div class="swiper-slide">
+                                    <img id="img3"  style="width: 100%">
+                                </div>
+                                <div class="swiper-slide">
+                                    <img id="img4" style="width: 100%">
+                                </div>
+                                <div class="swiper-slide ultimo">
+                                    <img id="img5" style="width: 100%">
+                                    <a id="done" onclick="goToIndex()" class="" style="
+                                    position: absolute;
+                                    right: 25px;
+                                    bottom: 20px;
+                                    color: #fff;
+                                    font-size: 15px;
+                                    cursor: pointer;
+                                    width: 60px;
+                                    height: 60px;
+                                    text-align: center;
+                                    background: #3c8fd7;
+                                    border-radius: 50%;
+                                    "><div style="margin-top: 20px" id="done_div">Done</div></a>
+                                </div>
+                            </div>
+
+                            <div class="swiper-button-prev"></div>
+                            <div class="swiper-button-next"></div>
+
+
+                            <a id="skip" onclick="goToIndex()" class="" style="
+                            position: absolute;
+                            left: 25px;
+                            bottom: 20px;
+                            color: #2196F3;
+                            font-size: 15px;
+                            z-index: 999;
+                            cursor: pointer;
+                            width: 60px;
+                            height: 60px;
+                            text-align: center;
+                            background: #fff;
+                            border-radius: 50%;
+                            "><div style="margin-top: 20px" id="skip_div">Skip</div></a>
+                        </div>
+                    </div>
+                </div>
+                <!-- -->
+
+
+
+                <!-- GUEST REGISTRATION -->
+                <div class="page navbar-fixed cached" data-page="page-guest-registration">
+                    <!-- TOP NAVBAR -->
+                    <div class="navbar ">
+                        <div class="navbar-inner">
+                            <div class="left">
+                                <a href="#" class="back link icon-only open-login-screen">
+                                    <i class="f7-icons" >chevron_left</i>
+                                </a>
+                            </div>
+                            <div class="center lang__registration_title" style="color: #fff">Guest Registration</div>
+                            <div class="right">
+                                <a href="#" class="back link icon-only open-login-screen">
+                                    <img src="img/blank-arrow.png" width="30px">
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="page-content">
+                        <div class="list-block input-list">
+                            <ul class="lista-transparent">
+                                <!-- DIV AJAX FROM login-request-registration -->
+                                <div id="form-login-registration"></div>
+                            </ul>
+                        </div>
+
+                        <div class="submit-button-form">
+                            <a href="#" onclick="UpdateGuest();" class="button button-big button-fill button-raised color-cyan lang__gr_register">REGISTER</a>
+                            <a href="#" class="button button-big button-fill button-raised color-red last-input-small open-login-screen lang__gr_cancel">CANCEL</a>
+                        </div>
+                        <input type="submit" class="go-capture" />
+                    </div>
+                </div>
+                <!-- END GUEST REGISTRATION -->
+
+
+
+
+
+                <!-- DASHBOARD -->
+                <div class="page navbar-fixed cached" data-page="page-request">
+                    <!-- TOP NAVBAR -->
+                    <div>
+                        <div class="navbar" style="height: 85px;position: absolute;width: 100%;z-index: 2;"></div>
+                        <!--<div class="blue-nav-bar" style="background-size: cover;height: 85px;position: absolute;width: 100%;z-index: 2;"></div>-->
+                        <div class="navbar no-border">
+                            <div class="navbar-inner">
+                                <div class="left">
+                                    <a href="#index" class="link icon-only " >
+                                        <i class="f7-icons" >chevron_left</i>
+                                    </a>
+                                </div>
+                                <!--<div class="left">
+                                    <a onclick="goToIndex()" class="back link icon-only">
+                                        <img src="img/back-arrow.png" width="30px">
+                                    </a>
+                                </div>-->
+                                <div class="center color-white lang__dashboard_title">Requests</div>
+                                <div class="right">
+                                    <a href="#form-search-home" class="link icon-only mostrar-search">
+                                        <i class="f7-icons">search</i>
+                                    </a>
+                                </div>
+                                <!--<div class="right">
+                                    <a href="#form-search-home" class="link icon-only mostrar-search"> <img src="img/search.png" width="24px"></a>
+                                </div>-->
+
+
+                                <div class="subnavbar">
+                                    <style media="screen">
+                                        .button {
+                                            border: 1px solid #ffffff !important;
+                                            color: #ffffff !important;
+                                        }
+                                    </style>
+                                    <div class="buttons-row">
+                                        <a href="#all" class="button tab-link active lang__dashboard_all" style="font-size: 61% !important;">ALL</a>
+                                        <a href="#pending" class="button tab-link lang__dashboard_pending" style="font-size: 61% !important;">PENDING</a>
+                                        <a href="#completed" class="button tab-link lang__dashboard_completed" style="font-size: 61% !important;">COMPLETED</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="toolbar hotel-name-bottom">
+                        <div class="toolbar-inner">
+                            <div style="text-align: center; width: 100%;" class="name-hotel-title-bottom" id="requests-name-hotel"></div>
+                        </div>
+                    </div>
+
+
+                    <!-- INICIA LA BARRA DE BÚSQUEDA - INICIO -->
+                    <form style="display: none; z-index: 500" class="searchbar searchbar-init" id="form-search-home" data-search-list=".list-block-search" data-search-in=".item-title,.item-subtitle" data-found=".searchbar-found" data-not-found=".searchbar-not-found">
+                        <div class="searchbar-input">
+                            <input type="search" placeholder="Search" id="input-search-home" class="lang__dashboard_search">
+                            <a href="#" id="clear-search" class="searchbar-clear"></a>
+                        </div>
+                    </form>
+                    <style media="screen">
+                        .navbar-fixed .page>.searchbar,
+                        .navbar-through .page>.searchbar,
+                        .navbar-fixed>.searchbar,
+                        .navbar-through>.searchbar {
+                            top: 87px;
+                        }
+                    </style>
+                    <div id="overlay-search" class="searchbar-overlay"></div>
+                    <!-- TERMINA LA BARRA DE BÚSQUEDA - INICIO -->
+
+                    <a onclick="GoToCreateRequest()" class="floating-button color-pink" style="margin-bottom: 40px;margin-right: -6px;background-color: #212f51;">
+                        <i class="fa fa-plus"></i>
+                    </a>
+
+                    <!-- AQUI COMIENZA EL FORMULARIO DE INICIO -->
+                    <div class="page-content pull-to-refresh-content" data-ptr-distance="55">
+                        <!-- INICIA EL PULL-TO-REFRESH - INICIO -->
+                        <div class="pull-to-refresh-layer" style="margin-top: -90px">
+                            <div class="preloader"></div>
+                            <div class="pull-to-refresh-arrow"></div>
+                        </div>
+                        <!-- TERMINA EL PULL-TO-REFRESH - INICIO -->
+
+
+
+                        <!-- AQUI VA CUANDO NO ENCUENTRA INFORMACION EN LA BUSQUEDA -->
+                        <div class="content-block searchbar-not-found lang__dashboard_no_search">
+                            Nothing found
+                        </div>
+
+                        <!-- TABS DE LA INFORMACION DE INICIO   -->
+                        <div class="tabs" style="margin-top: -10px !important; margin-bottom: 100px !important;" id="tabs-index">
+                            <div id="all" class="tab active">
+
+                                <!-- PENDING EVENTS -->
+                                <div class="list-block media-list list-block-search searchbar-found">
+                                    <div id="all-dashboard-pending">
+                                        <!-- EVENTS PENDING -->
+                                    </div>
+                                </div>
+
+                                <!--  COMPLETED -->
+                                <div class="list-block media-list list-block-search searchbar-found">
+                                    <div id="all-dashboard-completed">
+                                        <!-- EVENTS COMPLETED -->
+                                    </div>
+                                </div>
+
+
+                            </div>
+
+                            <!--TABS PENDING-->
+                            <div id="pending" class="tab">
+                                <div class="list-block media-list list-block-search searchbar-found">
+                                    <div id="dashboard-pending">
+                                        <!-- EVENTS PENDING -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!--TABS COMPLETED-->
+                            <div id="completed" class="tab">
+                                <div class="list-block media-list list-block-search searchbar-found">
+                                    <div id="dashboard-completed">
+                                        <!-- EVENTS COMPLETED -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--div class="kc_fab_wrapper">
+
+                        </div-->
+
+
+                    </div>
+                </div>
+                <!-- END DASHBOARD -->
+
+
+                <!-- CREATE REQUEST -->
+                <div class="page navbar-fixed cached" data-page="page-create-request">
+                    <!-- TOP NAVBAR -->
+                    <div class="navbar  theme-white">
+                        <div class="navbar-inner">
+                            <div class="left">
+                                
+                                <a href="index.html" class="back link icon-only" >
+                                    <i class="f7-icons" >chevron_left</i>
+                                </a>
+                            </div>
+                            <div class="center lang__create_request_title" style="color: #fff">Create Request</div>
+                            <div class="right">
+                                <img src="img/blank-arrow.png" width="30px">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="page-content" id="form-create-request">
+
+                    </div>
+                </div>
+                <!-- FIN CREATE REQUEST -->
+
+
+                <!-- VIEW EVENT -->
+                <div class="page navbar-fixed cached" data-page="page-view-request">
+                    <!-- TOP NAVBAR -->
+                    <div class="navbar ">
+                        <div class="navbar-inner">
+                            <div class="left">
+                                
+                                <a href="index.html" class="back link icon-only" >
+                                    <i class="f7-icons" >chevron_left</i>
+                                </a>
+                            </div>
+                            <div class="center lang__view_request_title" style="color: #fff">View Request</div>
+                            
+                            <div class="right" style="margin-right: 7px;" onclick="GoToChat()">
+                                <i class="fa fa-comments fa-2x" style="color: white" aria-hidden="true"></i>
+                                <span class="badge2">1</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="page-content" id="form-view-request">
+
+                    </div>
+                </div>
+                <!-- FIN VIEW EVENT -->
+
+
+                <!-- VIEW CHAT MESSAGE -->
+                <div class="page navbar-fixed toolbar-fixed cached" data-page="page-view-chat">
+                    <!-- TOP NAVBAR -->
+                    <div class="navbar ">
+                        <div class="navbar-inner">
+                            <div class="left">
+                                <a href="index.html" class="back link icon-only">
+                                    <i class="f7-icons" >chevron_left</i>
+                                </a>
+                            </div>
+                            <div id="chat_message_title" class="center " style="color: #fff">Chat Messages</div>
+                            <div class="right">
+                                <img src="img/blank-arrow.png" width="30px">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="toolbar messagebar" style="background-color: white; " id="toolbar-page-message" >
+                        <div class="toolbar-inner" >
+                            <textarea id="comment_text" placeholder="Comment..."  class=""></textarea><a href="#" class="link lang__c_send" style="color: #212f51">Send</a>
+                        </div>
+                    </div>
+                    <div class="page-content messages-content" style="background-color: #E3F2FD">
+                        <div class="messages" id="form-view-chat" >
+                        </div>
+                    </div>
+                </div>
+                <!-- FIN VIEW CHAT MESSAGE -->
+
+
+
+                <!-- HOTEL DIRECTORY OLD VERSION-->
+                <div class="page navbar-fixed cached" data-page="page-hotel-directory-2">
+                    <!-- TOP NAVBAR -->
+                    <div class="navbar ">
+                        <div class="navbar-inner">
+                            <div class="left">
+                                
+                                <a href="#" class="back link icon-only" >
+                                    <i class="f7-icons" >chevron_left</i>
+                                </a>
+                            </div>
+                            <div class="center lang__hotel_directory_tite" style="color: #fff">Directory</div>
+                            <div class="right">
+                                <img src="img/blank-arrow.png" width="30px">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="page-content" id="form-hotel-directory">
+                        <!-- INFORMATION TO AJAX -->
+                        <!-- form-hotel-directory.php -->
+                        <!-- END INFORMATION TO AJAX -->
+                    </div>
+                </div>
+                <!--FIN HOTEL DIRECTORY OLD-->
+
+                <!-- HOTEL DIRECTORY -->
+                <div class="page navbar-fixed cached" data-page="page-hotel-directory">
+                    <!-- TOP NAVBAR -->
+                    <div class="navbar ">
+                        <div class="navbar-inner">
+                            <div class="left">
+                                
+                                <a href="#" class="back link icon-only" >
+                                    <i class="f7-icons" >chevron_left</i>
+                                </a>
+                            </div>
+                            <div class="center lang__hotel_directory_tite" style="color: #fff">Directory</div>
+                            
+                        </div>
+                    </div>
+                    <div class="page-content" id="form-hotel-directory-1" style="overflow-x: hidden;">
+
+                        <div class="background-adjust" id="cover-directory" style="padding: 30px 0px;height: 100px; background-image:url(http://hotel.mynuvola.com/images/hotels-logos-angel/default-login.jpg)">
+                            <div class="data-hotel">
+                                  <h2 class="non-margin" id="hotel_name">Park Place Hotel</h2>
+                                  <p class="non-margin" id="hotel_address" style="font-size: 2.5vw">Calle 34#7h-10 Barranquilla, Colombia</p>
+                                  <!--<div class="hotel-third"></div>-->
+                                  <!--<div class="hotel-third"><a href="https://www.mynuvola.com" class="external" target="_blank">https://www.mynuvola.com</a></div>-->
+                                  <div id="hotel_phone">+1 (786) 123-4567<a href="tel://2147483647" class="external"> <span class="badge bg-white my-badge"> CALL</span></a></div>
+                            </div>
+                        </div>
+                        <div class="label-category lang__title_categories">
+                            Categorias 
+                        </div>
+                        <div id="div-categories">
+                            <div style="display: flex; justify-content: center; align-items: center; height: 100%">
+                                <div style="text-align: center">
+                                    <i class="fa fa-bell" style="font-size: 120px; color: #9E9E9E"></i>
+                                    <div class="lang__no_activity" style="margin-top: 5px; color: #9E9E9E;font-family: \'Montserrat\', sans-serif !important;font-weight: 600 !important; font-size: 18px">No Activity</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- FIN HOTEL DIRECTORY -->
+
+                <!-- INICIO DETALLE DE CATEGORIAS DEL DIRECTORIO -->
+                <div class="page navbar-fixed cached" data-page="page-detail-category">
+                    <div class="navbar">
+                        <div class="navbar-inner">
+                            <div class="left">
+                                <a href="index.html" class="back link icon-only">
+                                    <i class="f7-icons" >chevron_left</i>
+                                </a>
+                            </div>
+                            <div class="center lang__hotel_directory_tite" style="color: #fff">Detail category</div>
+                            <!--<div class="right"  class="link icon-only">
+                                <i class="fa fa-shopping-basket" aria-hidden="true"></i>
+                            </div>-->
+                        </div>
+                    </div>
+                    <div class="page-content" style="overflow-x: hidden;">
+                        <div class="img-detail-category" id="div-cover-category" style="height: 55px; background-image:url(http://www.mynuvola.com/angel_v2/img/food_and_beverage_1.jpg);">
+                            <div id="title-detail-category" class="capitalize">Food & Beverage</div>
+                        </div>
+                        <div id="div-items-category" style="height: 50%">
+                            <div style="display: flex; justify-content: center; align-items: center;">
+                                <h3>No info</h3>
+                            </div>
+                        </div>                            
+                    </div>
+                </div>
+                <!-- FIN DETALLE DE CATEGORIAS DEL DIRECTORIO -->
+
+
+                <!--INICIO DETALLE DEL SHOPPING CART-->
+                <div class="page navbar-fixed  cached" data-page="page-detail-shopping-cart">
+                    <div class="navbar ">
+                        <div class="navbar-inner">
+                            <div class="left">
+                                <a href="#" class="back link icon-only">
+                                    <i class="f7-icons" >chevron_left</i>
+                                </a>
+                            </div>
+                            <div class="center lang__detail_cart_title" id="title-header" style="color: #fff">Detail</div>
+                            <input type="hidden" name="" id="product_name">
+                            <div class="right">
+                                <a href="#" onclick="GoToPlaceOrder()" class="link icon-only">
+                                    <i class="icon fa fa-shopping-basket fa-lg" id="total_items_2" aria-hidden="true">
+                                        
+                                    </i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="page-content">
+                        <!-- Slider -->
+                         <div style="height: 50%">   
+                            <div  data-pagination=".swiper-pagination" data-space-between="0" data-next-button=".swiper-button-next" data-prev-button=".swiper-button-prev" data-pagination-clickable="true" class="swiper-container swiper-init">
+
+                                <div class="swiper-pagination"></div>
+                                <div class="swiper-wrapper" id="swiper-images">
+                                </div>
+                                    <input type="hidden" name="" id="img_1">
+                            </div>
+                        </div>
+                        <input type="hidden" name="product_id" id="product_id"> 
+                        <div class="card-header">
+                            <div><div id="item-name">Dish Name</div>
+                                <div style="font-size: 80%"><i class="fa fa-star color-yellow" aria-hidden="true"></i>
+                                <i class="fa fa-star color-yellow" aria-hidden="true"></i>
+                                <i class="fa fa-star color-yellow" aria-hidden="true"></i>
+                                <i class="fa fa-star color-yellow" aria-hidden="true"></i>
+                                <i class="fa fa-star color-yellow" aria-hidden="true"></i>
+                                <i class="color-gray" style="font-style: normal;"></i>
+                                </div> 
+                            </div>
+                                <div class="avatar-price" id="label-price">&nbsp; $ 0.00 &nbsp;</div>
+                                <input type="hidden" name="price" id="price">   
+                        </div>
+                       <input type="hidden" name="limit" id="amount" value="5">
+                        <div class="card-content">
+                            <div class="card-content-inner" style="margin-bottom: 50px">
+                                <small class="label-desc-detail-product lang__description_title">DESCRIPTION</small>
+                              <p style="text-align: justify; margin-top: 10px" id="description">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras laoreet imperdiet pulvinar. Sed at laoreet risus. Nulla porta tristique nulla, ac molestie justo eleifend vitae. 
+                              <br/><br/>Etiam hendrerit risus eros, eget elementum risus tincidunt quis. Etiam ac malesuada nisl, at viverra dui. Vivamus vel scelerisque purus. Vestibulum commodo erat vel leo finibus, non tristique libero vehicula. Pellentesque lobortis euismod diam ut placerat.</p>
+                            </div>      
+                        </div>
+                       
+                        
+                    </div>
+                    <div class="toolbar" style="background-color: #fff">
+                        <div class="toolbar-inner row no-gutter">
+                            
+                                <div class="col-10" onclick="control_amount_items('control-amount',-1, 'amount')" style="background-color: #ddd; text-align: center;"><i  class="fa fa-minus color-gray img-control-order"></i></div>&nbsp;
+                                <div class="col-25" style="border: 1px solid #ddd" disabled="disabled"><input type="text" name="" id="control-amount" value="1" class="input-control-order" ></div>&nbsp;
+                                <div class="col-10" onclick="control_amount_items('control-amount',1, 'amount')" style="background-color: #ddd; text-align: center;"><i  class="fa fa-plus color-gray img-control-order"></i></div>&nbsp;
+                                <div class="col-50"><a href="#" class="button button-fill lang__add_to_order" style="background-color: #899c00; font-size: 10px; text-transform: uppercase;" onclick="AddToCart()"> ADD TO CART </a></div>
+                    
+                        </div>
+
+                    </div>
+                </div>
+                <!--FIN DETALLE DEL SHOPPING CART-->
+
+                <!--INICIO DEL SHOPPING CART-->
+                <div class="page navbar-fixed cached" data-page="page-product-list">
+                    <div class="navbar">
+                        <div class="navbar-inner">
+                            <div class="left">
+                                <a href="#" onclick="goToIndex()" class="back link icon-only" >
+                                    <i class="f7-icons" >chevron_left</i>
+                                </a>
+                            </div>
+                            <div class="center lang__product_list_title" style="color: #fff">Product List</div>
+                            <div class="right">
+                                <a href="#" onclick="GoToPlaceOrder()" class="link icon-only">
+                                <i class="icon fa fa-shopping-basket fa-lg" id="total_items_1" aria-hidden="true">
+                                </i>
+                                </a>    
+                            </div>
+                        </div>
+                    </div>
+                     <form data-search-list=".list-block-search" data-search-in=".item-search" class="searchbar searchbar-init">
+                        <div class="searchbar-input">
+                          <input type="search" placeholder="Search" class="lang__dashboard_search"><a href="#" class="searchbar-clear"></a>
+                        </div><a href="#" class="searchbar-cancel">Cancel</a>
+                      </form>
+                    <div class="page-content pull-to-refresh-content" id="div-shopping-cart" data-ptr-distance="55">
+                        <!-- INICIA EL PULL-TO-REFRESH - productos -->
+                        <div class="pull-to-refresh-layer" style="margin-top: -44px">
+                            <div class="preloader"></div>
+                            <div class="pull-to-refresh-arrow"></div>
+                        </div>
+
+                        <div class="content-block searchbar-not-found">
+                            <div style="text-align: center;">
+                                <i class="color-gray fa fa-5x fa-info-circle" aria-hidden="true"></i>
+                                <h3 class="lang__dashboard_no_search">No encontramos información</h3>
+                            </div>
+                            
+                        </div>
+                        <div id="product-list-block" class="list-block list-block-search searchbar-found">
+                            <ul>
+                                <div class="row no-gutter" id="products-list">
+                                </div>
+                            </ul>    
+                        </div>    
+                    </div>
+                </div>
+                <!-- FIN SHOPPING CART-->
+
+                <!-- INICIO PLACE ORDER -->
+                <div class="page navbar-fixed cached" data-page="page-place-order">
+                    <!--<a href="#" class="floating-button add-cart-color-green open-obs-modal" style="margin-bottom: 40px;margin-right: -6px;background-color: #899c00;">
+                        <i class="fa fa-comment fa-2x" aria-hidden="true"></i>
+                    </a>-->
+                        <div class="navbar">
+                            <div class="navbar-inner">
+                                <div class="left">
+                                    <a href="#" onclick="GoToProductList()" class="link icon-only">
+                                        <i class="f7-icons" >chevron_left</i>
+                                    </a>
+                                </div>
+                                <div class="center lang__place_order" style="color: #fff">Place Order</div>
+                                <!--<div class="right">
+                                    <a href="#"  class="link icon-only open-obs-modal">
+                                        <i class="fa fa-comment fa-lg" aria-hidden="true"></i>
+                                    </a>
+                                </div>-->
+                            </div>
+                        </div>
+                        <form data-search-list=".list-block-search" data-search-in=".item-title" class="searchbar searchbar-init">
+                            <div class="searchbar-input">
+                              <input type="search" placeholder="Search" class="lang__dashboard_search"><a href="#" class="searchbar-clear"></a>
+                            </div><a href="#" class="searchbar-cancel">Cancel</a>
+                          </form>
+                        <div class="page-content bg-white">
+                                <div class="content-block searchbar-not-found">
+                                    <div style="text-align: center;">
+                                        <i class="color-gray fa fa-5x fa-info-circle" aria-hidden="true"></i>
+                                        <h3  class="lang__dashboard_no_search">No encontramos información</h3>
+                                    </div>                                        
+                                </div>
+                                <div id="product-list-block" class="list-block list-block-search">
+                                  <ul id="order-list">
+                                    <li>
+                                      <a href="#" class="item-content default-border">
+                                        <div class="item-media"><img src="" width="40" height="40"></div>
+                                        <div class="item-inner">
+                                          <div class="item-title-row row" style="background-color: #fff">
+                                            <div class="col-60">
+                                                <div class="item-title color-black">Aliquam Tempor</div>
+                                                <div class="item-subtitle color-gray">$ 12.00</div>
+                                            </div>
+                                            <div class="col-40">
+                                                <div class="row no-gutter" style="background-color: #fff; display: table;">
+                                                    <div class="col-25 btn-control-place-order"><i onclick="control_amount_items('control-place-order',-1)" class="fa fa-minus-circle fa-lg add-cart-color-green"></i></div>&nbsp;
+                                                    <div class="col-40   table-cell div-control-place-order"><input type="text" name="" value="0" id="control-place-order" class="input-control-place-order" style="height: 35px"></div>&nbsp;
+                                                    <div class="col-25 btn-control-place-order"><i onclick="control_amount_items('control-place-order',1)" class="fa fa-plus-circle fa-lg add-cart-color-green"></i></div>
+                                                </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </a>
+                                    </li>
+                                  </ul>
+                                </div>
+                        </div>  
+                        <div class="toolbar" style="background-color: #ddd">
+                            <div class="toolbar-inner row">
+                                    <div class="col-50 color-gray align-place-order"><div class="label-total-place-order">Total</div><div id="label-total-order">$ 0.00</div></div>
+                                    <div class="col-50"><a href="#" id="btn-place-order" class="button button-fill lang__place_order capitalize" onclick="CreateOrder()"> PLACE ORDER </a></div>
+                                    <input type="hidden" name="" id="input-total-order">
+                            </div>
+                        </div>
+                </div>
+                <!--FIN PLACE ORDER-->
+
+                <!--INICIO TIPS old-->
+                <div class="page navbar-fixed cached" data-page="page-tips-old">
+                    <div class="navbar">
+                        <div class="navbar-inner">
+                            <div class="left">
+                                <a href="#" onclick="goToIndex()" data-ignore-cache="true" data-force="true" class="back link icon-only">
+                                    <i class="f7-icons" >chevron_left</i>
+                                </a>
+                            </div>
+                            <div class="center lang__menu_tips" style="color: #fff">Tips</div>
+                            <div class="right">
+                                <img src="img/blank-arrow.png" width="30px">
+                            </div>
+                        </div>
+                    </div> 
+                    <div class="page-content" >
+                        <div class="list-block" style="margin: 0 25px">
+                            <ul style="background-color: transparent; padding: 15px; text-align: center;">
+                                <li class="lang__deliver_my_tip" style="color: #191919">Deliver my tip to:</li>
+                                <br/>
+                                <li>
+                                        
+                                        <div style="text-align: center;">
+                                            <i class="fa icon-staff-hotel" id="icon_department" style="font-size: 80px; color: #212f51"></i>
+                                        </div>
+                                        <br>
+                                    <a href="#" class="item-link smart-select button button-big button-fill" data-back-on-select="true" style="background-color: #212f51">
+                                        <select id="departments" onchange="onChangeDepartment()">
+                                                <option value="" class="lang__select_department">Select Department</option>
+                                                  <option value="H" class="lang__housekeeper">Housekeeper</option>
+                                                  <option value="C" class="lang__concierge">Concierge</option>
+                                                  <option value="F" class="lang__front_desk">Front Desk</option>
+                                        </select>
+                                        <div id="title-select-dept" style="color: #fff">Select Department</div>
+                                    </a>
+                                </li>
+                                <li id="delivery-options" style="display: none">
+                                    
+                                    <div class="content-block accordion-list custom-accordion">
+                                      <div id="accordion-team" class="accordion-item accordion-item-expanded" onclick="deliveryOption('ht')">
+                                        <div class="accordion-item-toggle row">
+                                          <div class="col-80" style="text-align: left;"><span class="lang__for_team">For everyone in the team</span></div>
+                                          <div class="col-20" style="text-align: right;" id="option-team">
+                                              <i class="fa fa-check-circle color-green" aria-hidden="true"></i>
+                                          </div>
+                                          
+                                          
+                                        </div>
+                                        <div class="accordion-item-content" style="text-align: left;">
+                                          <small class="lang__for_team_detail" >Your tip will distributed among the staff members that serviced you</small>
+                                        </div>
+                                      </div>
+                                      <br/>
+                                      <div id="accordion-specific"  class="accordion-item" onclick="deliveryOption('hs')">
+                                        <div class="accordion-item-toggle row">
+                                          <div class="col-80" style="text-align: left;"><span class="lang__for_specific">For someone in specific</span></div>
+                                          <div class="col-20" style="text-align: right;" id="option-specific"></div>
+                                          
+                                        </div>
+                                        <div class="accordion-item-content" id="name_specific" style="text-align: left;">
+                                            <small class="lang__for_specific_detail">Please add the name or names of the staff members. If you do not know them add a description, thanks or comment and we will take care of the rest.</small>
+                                            <input type="text" id="specific-name" class="lang__comments" style="border-bottom: 1px solid #ddd; text-align: center;" placeholder="Some extra details">
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div>
+                                        <input type="number" id="tip-value-1" style="border-bottom: 1px solid #ddd; text-align: center;" placeholder="Tip amount">
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="submit-button-form" style="margin: 0 25px; display: none">
+                            <a href="#" onclick="SaveTips()" class="button button-big button-fill button-raised" style="background-color: #4cd964"><span class="lang__c_send">SEND</span></a>
+                        </div>
+                    </div>
+                </div> 
+                <!--FIN TIPS old-->
+
+                <!--INICIO TIPS new-->
+                <div class="page navbar-fixed cached" data-page="page-tips">
+                    <div class="navbar">
+                        <div class="navbar-inner">
+                            <div class="left">
+                                <a href="#" onclick="goToIndex()" data-ignore-cache="true" data-force="true" class="back link icon-only">
+                                    <i class="f7-icons" >chevron_left</i>
+                                </a>
+                            </div>
+                            <div class="center lang__menu_tips" style="color: #fff">Tips</div>
+                            <div class="right">
+                                <img src="img/blank-arrow.png" width="30px">
+                            </div>
+                        </div>
+                    </div> 
+                    <div class="page-content">
+                        <div class="center-display" style="position: relative;z-index: 2; height: 90%;">
+                            <div class="row" style="height: 250px; padding: 0px 50px;">
+                                <div class="col-100">
+                                    <!--<a href="#" onclick="selectDepartment('housekeeper')" class="button button-big btn-action-blue "><span class="lang__housekeeper">Housekeeper</span></a>-->
+                                    <a href="#" onclick="selectDepartment('housekeeper')" class="button button-big button-fill button-raised" style="background-color: #212f51"><span class="lang__housekeeper">Housekeeper</span></a>
+                                </div>
+                                <div class="col-100">
+                                    <!--<a href="#"  onclick="selectDepartment('concierge')" class="button button-big btn-action-blue "><span class="lang__concierge">Coincerge</span></a>-->
+                                     <a href="#" onclick="selectDepartment('concierge')" class="button button-big button-fill button-raised" style="background-color: #212f51"><span class="lang__concierge">Concierge</span></a>
+                                </div>
+                                <div class="col-100">
+                                    <!--<a href="#"  onclick="selectDepartment('front_desk')" class="button button-big btn-action-blue "><span class="lang__front_desk">Front Desk</span></a>-->
+                                    <a href="#" onclick="selectDepartment('front_desk')" class="button button-big button-fill button-raised" style="background-color: #212f51"><span class="lang__front_desk">Front Desk</span></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="position: absolute;left: 1px;bottom: 1px;z-index: 1;">
+                            <i class="fa icon-tips" style="font-size: 200px; color: #e2e1e6"></i>
+                        </div>
+                    </div>
+                </div> 
+                <!--FIN TIPS-->
+
+                <!--INICIO TIPS SELECT DELIVERY-->
+                <div class="page navbar-fixed cached" data-page="page-tips-select-option">
+                    <div class="navbar">
+                        <div class="navbar-inner">
+                            <div class="left">
+                                <a href="#" class="back link icon-only">
+                                    <i class="f7-icons" >chevron-left</i>
+                                </a>
+                            </div>
+                            <div id="title-department" class="center" style="color: #fff"></div>
+                            <div class="right">
+                                <img src="img/blank-arrow.png" width="30px">
+                            </div>
+                        </div>
+                    </div> 
+                    <div class="page-content" >
+                        <div class="center-display" style="position: relative;z-index: 2; height: 85%">
+                            <div class="row" style="height: 170px; padding: 0px 40px;">
+                                <div class="col-100">
+                                    <!--<a href="#page-tips-team" class="button button-big btn-action-blue"><span class="lang__for_team">Team</span></a>-->
+                                    <a href="#page-tips-team" class="button button-big button-fill button-raised" style="background-color: #212f51"><span class="lang__for_team">Team</span></a>
+                                </div>
+                                <div class="col-100">
+                                    <!--<a href="#page-tips-specific" class="button button-big btn-action-blue"><span class="lang__for_specific">Specific</span></a>-->
+                                    <a href="#page-tips-specific" class="button button-big button-fill button-raised" style="background-color: #212f51"><span class="lang__for_specific">Specific</span></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="position: absolute;left: 1px;bottom: 0px;z-index: 1;">
+                            <i id="image-department" class="fa" style="font-size: 250px; color: #e2e1e6"></i>
+                        </div>
+                    </div>
+                </div> 
+                <!--FIN TIPS SELECT DELIVERY-->
+
+                <!--INICIO TIPS FOR TEAM-->
+                <div class="page navbar-fixed cached" data-page="page-tips-team">
+                    <div class="navbar">
+                        <div class="navbar-inner">
+                            <div class="left">
+                                <a href="#" class="back link icon-only">
+                                    <i class="f7-icons" >chevron-left</i>
+                                </a>
+                            </div>
+                            <div id="title-department-team" class="center" style="color: #fff"></div>
+                            <div class="right">
+                                <img src="img/blank-arrow.png" width="30px">
+                            </div>
+                        </div>
+                    </div> 
+                    <div class="page-content">
+                        <div style="margin-top: 60px; padding: 0 50px">
+                            
+                            <div class="center-display margin-top-20">
+                                <span class="lang__for_team" style="text-transform: uppercase; color: #212f51">Team</span>
+                            </div>
+                            <div class="center-display margin-top-20" style="text-align: center; color: #9e9e9e">
+                                <span class="lang__for_team_detail"></span>
+                            </div>
+                            <div class="center-display" style="margin-top: 120px">
+                                <input type="number" id="tip-value-team" style="background: transparent;text-align: center;border: none;border-bottom: 2px solid #ddd;width: 100%; font-size: 20px" placeholder="Tip amount">
+                            </div>
+                            <div style="margin-top: 120px">
+                                <!--<a href="#" onclick="SaveTips('team')" class="button button-big btn-action-blue "><span class="lang__c_send" style="text-transform: uppercase;">Send</span></a>-->
+                                <a href="#" onclick="SaveTips('team')" class="button button-big button-fill button-raised" style="background-color: #212f51; text-transform: uppercase;"><span class="lang__c_send">SEND</span></a>
+                            </div>
+                        </div>
+                    </div>
+                </div> 
+                <!--FIN TIPS FOR TEAM-->
+
+                <!--INICIO TIPS FOR SPECIFIC-->
+                <div class="page navbar-fixed cached" data-page="page-tips-specific">
+                    <div class="navbar">
+                        <div class="navbar-inner">
+                            <div class="left">
+                                <a href="#" class="back link icon-only">
+                                    <i class="f7-icons" >chevron-left</i>
+                                </a>
+                            </div>
+                            <div id="title-department-specific" class="center" style="color: #fff"></div>
+                            <div class="right">
+                                <img src="img/blank-arrow.png" width="30px">
+                            </div>
+                        </div>
+                    </div> 
+                    <div class="page-content" >
+                        <div style="margin-top: 60px; padding: 0 50px">
+                            
+                            <div class="center-display margin-top-20">
+                                <span class="lang__for_specific" style="text-transform: uppercase; color: #212f51">Specific</span>
+                            </div>
+                            <div class="center-display margin-top-20" style="text-align: center; color: #9e9e9e">
+                                <span class="lang__for_specific_detail"></span>
+                            </div>
+                            <div style="margin-top: 30px">
+                                <textarea placeholder="Comments..." class="comment-box-wakeupcall" id="specific-tip-comments"></textarea>
+                            </div>
+                            <div class="center-display margin-top-20">
+                                <input type="number" id="tip-value-specific" style="background: transparent;text-align: center;border: none;border-bottom: 2px solid #ddd;width: 100%; font-size: 20px" placeholder="Tip amount">
+                            </div>
+                            
+                            <div style="margin-top: 55px">
+                                <!--<a href="#" onclick="SaveTips('specific')" class="button button-big btn-action-blue "><span class="lang__c_send" style="text-transform: uppercase;">Send</span></a>-->
+                                <a href="#" onclick="SaveTips('specific')" class="button button-big button-fill button-raised" style="background-color: #212f51; text-transform: uppercase;"><span class="lang__c_send">SEND</span></a>
+                            </div>
+                        </div>
+                    </div>
+                </div> 
+                <!--FIN TIPS FOR SPECIFIC-->
+
+                <!-- TRIP ADVISOR -->
+                <div class="page navbar-fixed cached" data-page="page-tripadvisor">
+                    <div class="navbar">
+                        <div class="navbar-inner">
+                            <div class="left">
+                                <a href="index.html" class="back link icon-only">
+                                    <i class="f7-icons" >chevron_left</i>
+                                </a>
+                            </div>
+                            <div class="center" style="color: #fff">TripAdvisor</div>
+                            <div class="right">
+                                <img src="img/blank-arrow.png" width="30px">
+                            </div>
+                        </div>
+                    </div>
+                    <div id="tripAdvisorContainer" class="page-content bg-white" style="display: flex;justify-content: center;align-items: center;">
+                            <div id="TA_cdswritereviewlg297" class="TA_cdswritereviewlg">
+                        <ul id="2arPwvh0NzPa" class="TA_links 0Oob2O5TRCJ7">
+                        <li id="CNO86iet" class="WSfG522TVof">
+                        <a target="_blank" href="https://www.tripadvisor.com/"><img src="https://www.tripadvisor.com/img/cdsi/img2/branding/medium-logo-12097-2.png" alt="TripAdvisor"/></a>
+                        </li>
+                        </ul>
+                        </div>
+                        <script src="https://www.jscache.com/wejs?wtype=cdswritereviewlg&amp;uniq=297&amp;locationId=123456&amp;lang=en_US&amp;lang=en_US&amp;display_version=2"></script>
+                        
+                      
+                    </div>
+                </div>
+                <!-- FIN TRIPADVISOR -->
+                <!-- INICIO WAKE UP CALLS -->
+                <div class="page navbar-fixed cached" data-page="page-wake-up-calls">
+                    <div class="navbar">
+                        <div class="navbar-inner">
+                            <div class="left">
+                                <a href="#"  class="back link icon-only">
+                                    <i class="f7-icons" >chevron_left</i>
+                                </a>
+                            </div>
+                            <div class="center lang__menu_wake_up_calls" style="color: #fff">Wake Up Calls</div>
+                            <div class="right">
+                                <img src="img/blank-arrow.png" width="30px">
+                            </div>
+                        </div>
+                    </div> 
+                    <div class="page-content">
+                        <div style="margin-top: 40px; padding: 0 30px">
+                            <div class="center-display" style="height: 180px">                                
+                                <!--<i class="fa icon-alarm-clock" style="font-size: 150px ; color: #212f51"></i>-->
+                                <img src="img/cover_wake_up_calls.png" style="width: 180px" >                           
+                            </div>
+                            <div class="center-display margin-top-20">
+                                <span class="title-wakeupcall lang__receive_call">¿A qué hora te gusta recibir tu llamada por despertar?</span>
+                            </div>
+                            <div class="center-display div-datetime margin-top-20">
+                                <input id="alarm-picker" class="datetime-class" type="datetime-local" placeholder="Select Date" required/>
+                                <input id="alarm-picker-hide" style="display: none" type="datetime-local"/>
+                            </div>
+                            <div class="margin-top-20">
+                                <textarea placeholder="Comments..." class="lang__comments comment-box-wakeupcall" id="wake-up-comments"></textarea>
+                            </div>
+                            <div class="margin-top-20">
+                                <a href="#" onclick="SaveWakeUpCalls()" class="button button-big button-fill button-raised" style="background-color: #212f51"><span class="lang__c_send" style="text-transform: uppercase;">Send</span></a>
+                                <!--<a href="#" onclick="SaveWakeUpCalls()" class="button button-big button-fill button-raised" style="background-color: #212f51; height: 50px"><span class="lang__c_send">SEND</span></a>-->
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+                <!-- FIN WAKE UP CALLS -->
+
+                <!-- DIGITAL KEY -->
+                <div class="page navbar-fixed cached" data-page="page-digital-key">
+                    <div class="navbar">
+                        <div class="navbar-inner">
+                            <div class="left">
+                                <a href="index.html" class="back link icon-only">
+                                    <i class="f7-icons" >chevron_left</i>
+                                </a>
+                            </div>
+                            <div class="center" style="color: #fff; text-align: center; ">Digital Key</div>
+                            <div class="right">
+                                <img src="img/blank-arrow.png" width="30px">
+                            </div>
+                        </div>
+                    </div>
+                    <div  class="page-content">
+                      <div class="content-block center-display" style="height: 80%">
+                        <!--<a href="#" onclick="openDoor()" class="button button-big button-round" style="height: 95px; color: #ddd !important; background-color: darkgrey"><i class="fa fa-key fa-5x"></i></a>-->
+                        <a href="#" id="btn-open" onclick="openDoor()" class="button btn-open tick fa">   
+                        </a>
+                      </div>
+                    </div>
+                    <div class="toolbar toolbar-bottom">
+                        <div class="toolbar-inner">
+                            <small id="message">Welcome.</small>                
+                        </div>
+                      </div>
+                </div>
+                <!-- FIN DIGITAL KEY -->
+
+                <!-- MESSAGE HOTEL -->
+                <div class="page navbar-fixed cached" data-page="page-message-hotel">
+                    <!-- TOP NAVBAR -->
+                    <div class="navbar">
+                        <div class="navbar-inner">
+                            <div class="left">
+                                <a href="index.html" class="back link icon-only">
+                                    <img src="img/back-arrow.png" width="30px">
+                                </a>
+                            </div>
+                            <div class="center" style="color: #fff">Message Hotel</div>
+                            <div class="right">
+                                <img src="img/blank-arrow.png" width="30px">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="page-content" id="div-form-message-hotel">
+
+                        <!-- INFORMATION AJAX MESSAGE TO HOTEL -->
+
+
+                    </div>
+                </div>
+                <!-- FIN MESSAGE HOTEL -->
+
+
+                <!-- GUEST SURVEY-->
+                <div class="page navbar-fixed cached" data-page="page-guest-survey">
+                    <!-- TOP NAVBAR -->
+                    <div class="navbar ">
+                        <div class="navbar-inner">
+                            <div class="left">
+                                
+                                <a href="index.html" class="back link icon-only" >
+                                    <i class="f7-icons" >chevron_left</i>
+                                </a>
+                            </div>
+                            <div class="center lang__rate_my_stay" style="color: #fff">Rate My Stay</div>
+                            <div class="right">
+                                <img src="img/blank-arrow.png" width="30px">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="page-content" id="div-form-rate-stay">
+
+                        <!-- INFORMATION AJAX MESSAGE TO HOTEL -->
+
+
+
+
+                    </div>
+                </div>
+                <!-- FIN GUEST SURVEY -->
+
+
+                <!-- PAGE LIST PACKAGES -->
+                <div class="page navbar-fixed cached" data-page="page-packages-lostfound">
+
+                    <!-- TOP NAVBAR -->
+                    <div>
+                        <!--<div style="background-image: url('img/bg-menu.jpg') !important;background-size: cover;height: 85px;position: absolute;width: 100%;z-index: 2;"></div>-->
+                        <div class="navbar" style="height: 85px;position: absolute;width: 100%;z-index: 2;"></div>
+
+                        <div class="navbar no-border">
+                            <div class="navbar-inner">
+                                <div class="left">
+                                    <a href="#" class="back link icon-only" >
+                                        <i class="f7-icons" >chevron_left</i>
+                                    </a>
+                                </div>
+                                <div class="center color-white lang__package_title">Packages</div>
+                                <div class="right">
+                                    <a href="#" class="link icon-only ">
+                                        <img src="img/blank-arrow.png" width="30px">
+                                    </a>
+                                </div>
+
+
+                                <div class="subnavbar">
+                                    <style media="screen">
+                                        .button {
+                                            border: 1px solid #ffffff !important;
+                                            color: #ffffff !important;
+                                        }
+                                    </style>
+                                    <div class="buttons-row">
+                                        <a href="#tab-list-package" class="button tab-link active lang__package_pending" style="font-size: 61% !important;">PENDING</a>
+                                        <a href="#tab-list-lostfound" class="button tab-link lang__package_delivered" style="font-size: 61% !important;">DELIVERED</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <div class="page-content pull-to-refresh-content" >
+
+                        <!-- INICIA EL PULL-TO-REFRESH PACKAGES -->
+                        <div class="pull-to-refresh-layer" id="pull-to-refresh-pkgs" style="height: 30px">
+                            <div class="preloader"></div>
+                            <div class="pull-to-refresh-arrow"></div>
+                        </div>
+                        <!-- TERMINA EL PULL-TO-REFRESH PACKAGES -->
+
+
+                        <!-- Tabs animated wrapper, required to switch tabs with transition -->
+                        <div class="tabs"  id="tabs-packages page-content">
+
+                            <!--TABS ALL PENDING & DELIVERED PACKAGES -->
+                            <div id="tab-list-package" class=" tab active">
+
+                                <div class="list-block media-list " >
+                                    <div id="all-list-pk-pending">
+                                        <!-- PENDING PACKAGES -->
+                                    </div>
+                                </div>
+
+                                <!--<div class="list-block media-list ">
+                                    <div id="all-list-pk-completed">
+
+                                    </div>
+                                </div>-->
+                                <br><br>
+                            </div>
+                            <!-- END TABS ALL PENDING & DELIVERED PACKAGES -->
+
+
+                            <!--TABS ALL PENDING & DELIVERED LOST FOUND -->
+                            <div id="tab-list-lostfound" class="tab">
+
+                                <div class="list-block media-list " >
+                                    <div id="all-list-pk-completed">
+                                        <!-- PENDING PACKAGES -->
+                                    </div>
+                                </div>
+
+                                <!--<div class="list-block media-list ">
+                                    <div id="all-list-lf-completed">
+
+                                    </div>
+                                </div>-->
+                                <br><br>
+                            </div>
+                            <!-- END TABS ALL PENDING & DELIVERED LOST FOUND -->
+
+
+                        </div>
+
+
+                    </div>
+                </div>
+                <!-- PAGE END LIST PACKAGES -->
+
+
+                <!-- VIEW PACKAGE | LOST FOUND -->
+                <div class="page navbar-fixed cached" data-page="page-view-package">
+                    <!-- TOP NAVBAR -->
+                    <div class="navbar ">
+                        <div class="navbar-inner">
+                            <div class="left">
+                                
+                                <a href="index.html" class="back link icon-only" >
+                                    <i class="f7-icons" >chevron_left</i>
+                                </a>
+                            </div>
+                            <div class="center lang__view_package_title" style="color: #fff">View Package</div>
+                            <div class="right">
+                                <img src="img/blank-arrow.png" width="30px">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="page-content" id="form-view-package-lostfound">
+                        <img onclick="OpenViewPackage(this.src)" src="https://hotel.mynuvola.com/uploads/hotels/hotel_id_1/events_folder/caja.7780655_std.jpg" style="width: 100%;">
+
+                        <div style="padding: 10px">
+
+                        </div>
+
+                        <div class="label-input-general" style="margin: 10px;">Pantaloneta</div>
+                        <div>ID: 273</div>
+                        <div style="font-family: 'Montserrat', sans-serif !important;color: #616161;padding: 10px;background-color: #FFF;font-weight: 100;font-size: 14px;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce quis venenatis ipsum. Maecenas nunc risus, interdum nec tortor vitae, interdum rutrum neque. Integer non</div>
+
+                    </div>
+                </div>
+                <!-- FIN VIEW  PACKAGE | LOST FOUND -->
+
+
+            </div>
+        </div>
+
+    </div>
+    <!-- TERMINAN LAS VISTAS -->
+
+    <div class="notifications list-block media-list">
+        <ul>
+            <!-- Single notification item -->
+        </ul>
+    </div>
+</body>
+
+<!-- Librerias Javascript-->
+
+<script type="text/javascript" src="js/jquery-2.1.4.js"></script>
+
+<!-- Flags -->
+<script src="js/intlTelInput.js"></script>
+<script type="text/javascript" src="js/framework7.js"></script>
+<script type="text/javascript" src="js/app.js?v=16"></script>
+<script src="js/kc.fab.js"></script>
+<script type="text/javascript" charset="utf-8" src="phonegap.js"></script>
+
+<script>
+
+    $("#login-tel").intlTelInput();
+    $(document).ready(function() {
+        var links = [{
+            "icon": "+",
+            "title": "Click me"
+        }]
+        $('.kc_fab_wrapper').kc_fab(links);
+
+        setTimeout(function() {
+            AutoLogin();
+            
+        }, 400);
+    })
+</script>
+
+
+</html>
